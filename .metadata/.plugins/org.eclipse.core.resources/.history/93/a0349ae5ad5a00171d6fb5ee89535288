@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>SkuMagic</title>
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"></link>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"></link>
+<link rel="stylesheet" type="text/css" href="css/main.css"></link>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="js/purchseordercontroller.js"></script>
+<script type="text/javascript" src="js/dash.js"></script>
+</head>
+<body ng-app="PurchaseOrderManagement"
+	ng-controller="PurchaseOrderController">
+	<div class="nav-side-menu">
+		<div class="brand">
+			<i class="fa fa-magic fa-lg" aria-hidden="true"></i> SKU MAGIC
+		</div>
+		<i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse"
+			data-target="#menu-content"></i>
+		<div class="menu-list">
+			<div class="user">
+				<ul>
+					<li><i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i></li>
+					<li>User</li>
+				</ul>
+			</div>
+			<ul id="menu-content" class="menu-content collapse out">
+				<li><a href="#" onclick="$('.inner-container').show();$('#sync-data').hide();">
+						<i class="fa fa-dashboard fa-lg"></i>Dashboard
+				</a></li>
+				<li><a href="#" class="dash"> <i class="fa fa-user fa-lg"
+						aria-hidden="true"></i>My Account
+				</a></li>
+
+				<li><a href="#"> <i class="fa fa-sign-out"
+						aria-hidden="true"></i>Logout
+				</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="row topbar">
+		<div class="col-lg-12"></div>
+	</div>
+	
+
+	<div class="inner-container index-container">
+		<!-- Sync Data -->
+				<!-- Main Section -->
+		<div id="main-section">
+			<div class="row">
+				<div class="col-lg-4 square">
+					<div class ="square-i">
+					<a href="#" onclick="$('#sync-data').show();$('.inner-container').hide();" style="color:inherit;">
+					<div class="icon">
+					<i class="fa fa-shopping-cart" aria-hidden="true"></i>
+					</div>
+					Purchase Orders
+					</a>
+					</div>
+				</div>
+				<div class="col-lg-4 square">
+				<div class="square-i">
+						<div class="icon">
+						<i class="fa fa-product-hunt" aria-hidden="true"></i>
+						</div>
+						Products
+					</div>
+				</div>
+					<div class="col-lg-4 square">
+			<div class="square-i">
+				<div class="icon">
+						<i class="fa fa-line-chart" aria-hidden="true"></i>
+					</div>
+					Sales Orders
+					</div>
+				</div>
+				<div class="col-lg-4 square">
+					<div class="square-i">
+					<div class="icon">
+						<i class="fa fa-users" aria-hidden="true"></i>
+					</div>
+					Vendor
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-lg-4 square">
+					<div class="square-i">
+					<div class="icon">
+						<i class="fa fa-home" aria-hidden="true"></i>
+					</div>
+					Warehouse
+					</div>
+				</div>
+				<div class="col-lg-4 square">
+			<div class="square-i">
+				<div class="icon">
+						<i class="fa fa-truck" aria-hidden="true"></i>
+					</div>
+					Shipments
+					</div>
+				</div>
+				<div class="col-lg-4 square">
+					<div class="square-i">
+					<div class="icon">
+						<i class="fa fa-th-large" aria-hidden="true"></i>
+					</div>
+					Inventory
+					</div>
+				</div>
+				<div class="col-lg-4 square">
+					<div class="square-i">
+						<a href="#" onclick="$('.log-container').show(); $('.inner-container').hide();" style="color:inherit;">
+					<div class="icon">
+						<i class="fa fa-tasks" aria-hidden="true"></i>
+					</div>
+					Logs
+					</a> 
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Main section -->
+	</div>
+	<!-- Syn DaTA -->
+		<div class="index-container" id="sync-data" style="display: none;">
+			<div class="row text-center" style="margin: 20px">
+				<div class="col-lg-12">
+					<h1>Sync Data</h1>
+					<form ng-submit="submitPurchaseOrder()">
+						<input type="text" ng-model="purchaseorderForm.date" /> <input
+							type="submit" value="Submit" />
+					</form>
+				</div>
+			</div>
+			<!-- Table div starts here -->
+			<div class="row sync-row-head">
+				<div class="col-lg-1">
+					<h1>PO Status</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>Return Code</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>Integration Type</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>Dt of Retrieval</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>PO Number</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>PO Created Dt</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>Warehouse ID</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>Terms ID</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>Vendor ID</h1>
+				</div>
+				<div class="col-lg-2">
+					<h1>Carrier Details</h1>
+				</div>
+				<div class="col-lg-1">
+					<h1>SKU</h1>
+				</div>
+			</div>
+			<div class="row sync-row-data"
+				ng-repeat="purchaseorder in purchaseorders">
+				<div class="col-lg-1">{{ purchaseorder.CreatePOStatus }}</div>
+				<div class="col-lg-1">{{ purchaseorder.returnCode }}</div>
+				<div class="col-lg-1">{{ purchaseorder.Integration_Type }}</div>
+				<div class="col-lg-1">{{ purchaseorder.Date_of_Retrieval }}</div>
+				<div class="col-lg-1">{{ purchaseorder.Corresponding_PO_Number
+					}}</div>
+				<div class="col-lg-1">{{
+					purchaseorder.Corresponding_PO_Created_Date }}</div>
+				<div class="col-lg-1">{{
+					purchaseorder.Corresponding_WarehouseId }}</div>
+				<div class="col-lg-1">{{ purchaseorder.Corresponding_TermsId
+					}}</div>
+				<div class="col-lg-1">{{ purchaseorder.Corresponding_VendorId
+					}}</div>
+				<div class="col-lg-2">{{
+					purchaseorder.Corresponding_Carrier_details }}</div>
+				<div class="col-lg-1">{{ purchaseorder.Corresponding_SKU }}</div>
+			</div>
+		</div>
+
+		<img id="progress-image"
+			src="https://cdn.dribbble.com/users/920622/screenshots/2438218/shopping-cart.gif"
+			style="position: relative; margin:0 auto; width:100px; height: 60px; display: none;" />
+		<!-- End Sync Data -->
+	
+	
+		<div class="log-container index-container">
+		<div class="row skulog">
+		<div class="col-lg-4 square">
+					<div class="square-i">
+						<a href="#" onclick="$('#console').show(); $('.skulog').hide();getSkuLog()" style="color:inherit;">
+					<div class="icon">
+						<i class="fa fa-tasks" aria-hidden="true"></i>
+					</div>
+					Purchase Order Logs
+					</a> 
+					</div>
+					</div>
+		</div>
+		<div id="console" class="row sync-row-data" style="color: #000; overflow:auto; background-color: #fff; display: none;" ng-repeat="skulog in skulogs">
+				<div class="col-lg-3">{{ skulog.product_id }}</div>
+				<div class="col-lg-3">{{ skulog.date_search }}</div>
+				<div class="col-lg-3">{{ skulog.status }}</div>
+				<div class="col-lg-3">{{ skulog.response }}</div>
+			</div>
+		</div>
+	<!--     jQuery (necessary for Bootstrap's JavaScript plugins)
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+Include all compiled plugins (below), or include individual files as needed
+<script src="js/bootstrap.min.js"></script> -->
+</body>
+</html>

@@ -1,0 +1,15 @@
+<com.dell.toadext.services.impl.DriversList serialization="custom">
+  <unserializable-parents/>
+  <list>
+    <default>
+      <size>1</size>
+    </default>
+    <int>1</int>
+    <string>C:\Users\sreddy\Desktop\Java API\mysql-connector-java-5.0.8-bin.jar</string>
+  </list>
+  <com.dell.toadext.services.impl.DriversList>
+    <default>
+      <version>1</version>
+    </default>
+  </com.dell.toadext.services.impl.DriversList>
+</com.dell.toadext.services.impl.DriversList>
