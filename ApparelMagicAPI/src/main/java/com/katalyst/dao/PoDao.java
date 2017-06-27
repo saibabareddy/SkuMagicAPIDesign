@@ -23,8 +23,8 @@ public class PoDao {
 	public void createConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			String url = "jdbc:mysql://wmsmysql.cun5uvzp5qky.us-east-1.rds.amazonaws.com:3306/POIntegration";
-			conn = DriverManager.getConnection(url, "wmsmysqladmin", "WMSMySQLPass1");
+			String url = "jdbc:mysql://localhost:3306/POIntegration";
+			conn = DriverManager.getConnection(url, "root", "");
 			System.out.println("COnnection Successful");
 		} catch (Exception e) {
 			System.err.println(e.getMessage());

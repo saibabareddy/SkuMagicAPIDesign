@@ -25,8 +25,8 @@ public String toString() {
 public JSONObject toJSON(){
 	
 	JSONObject Carrier = new JSONObject();
-	Carrier.put("CarrierName", getProvider());
-	Carrier.put("ClassName", getName());
+	Carrier.put("name", getName());
+	Carrier.put("provider", getProvider());
 	return Carrier;
 }
 }

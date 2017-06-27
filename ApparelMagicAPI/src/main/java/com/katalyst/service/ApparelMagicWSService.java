@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.katalyst.controller.SkumagiconsoleController;
 import com.katalyst.dao.PoDao;
 import com.katalyst.dao.SkumagicconsoleDao;
+import com.katalyst.model.CarrierClass;
 import com.katalyst.model.CreateNewPO;
 import com.katalyst.model.CreateNewPO1;
 import com.katalyst.model.ShipVia;
@@ -62,7 +63,7 @@ public class ApparelMagicWSService {
 			for (int i = 0; i < j; i++) {
 				PO = (JSONObject) responsearray.get(i);
 				SkuJson post1 = mapPost1(PO);
-				ShipVia post3 = getNameForShipvia(PO.getString("ship_via"));
+				CarrierClass post3 = getCarrierClass(PO.getString("ship_via"));
 				CreateNewPO newpo = mapPO(PO);
 				purchase_order_items = (JSONArray) PO.get("purchase_order_items");
 				int k = purchase_order_items.size();
@@ -129,7 +130,7 @@ public class ApparelMagicWSService {
 
 	}
 
-	private JSONObject postJson(SkuJson post1, ArrayList<SkuLineItemsJson> post2, ShipVia post3) {
+	private JSONObject postJson(SkuJson post1, ArrayList<SkuLineItemsJson> post2, CarrierClass post3) {
 		JSONArray listorderitems = new JSONArray();
 		JSONObject postJson = new JSONObject();
 		int j = post2.size();
@@ -276,12 +277,11 @@ public class ApparelMagicWSService {
 		return name;
 	}
 
-	private ShipVia getNameForShipvia(String id) {
-		ShipVia via = new ShipVia();
+	private CarrierClass getCarrierClass(String id) {
+		CarrierClass via = new CarrierClass();
 		try {
 			if (id.equals(null)) {
-				via.setName("Ground");
-				via.setProvider("Thompson");
+				
 			} else {
 				JSONObject response = HttpClient.sendto(null, "GET",
 						"ship_methods/" + id + "?time=171114279788&token=64ebd05e550b23a15be09ccef57b27c6");
@@ -289,12 +289,12 @@ public class ApparelMagicWSService {
 				int i = responsearray.size();
 				// logger.info("Response of Shipviaid:"+ response.toString());
 				if (i == 0) {
-					via.setName("Ground");
-					via.setProvider("Thompson");
+					via.setCarrierName("Ground");
+					via.setClassName("Thompson");
 				} else {
 					JSONObject required = (JSONObject) responsearray.get(0);
-					via.setName(required.getString("name"));
-					via.setProvider(required.getString("provider"));
+					via.setCarrierName(required.getString("name"));
+					via.setClassName(required.getString("provider"));
 				}
 			}
 
@@ -330,24 +330,4 @@ public class ApparelMagicWSService {
 		return poiobj;
 	}
 
-/*	public void writeTofile(StringBuilder log) {
-
-		FileReader input = null; // output connection stream
-		FileWriter output = null; // output chain stream
-
-		try { // all the I/O stuff must be a in try/catch
-			File file = new File("C:/Users/sreddy/git/Apparel-Magic-API/src/main/resources/static/js/ApparelMagicLog.txt");
-			if (!file.exists()) {
-				file.createNewFile();
-				System.out.println("new file:" + file);
-			}
-
-			output = new FileWriter("C:/Users/sreddy/git/Apparel-Magic-API/src/main/resources/static/js/ApparelMagicLog.txt");
-
-			output.write(log.toString());
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}*/
 }
