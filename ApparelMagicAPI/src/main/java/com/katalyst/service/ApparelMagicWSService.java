@@ -20,6 +20,10 @@ import com.katalyst.dao.SkumagicconsoleDao;
 import com.katalyst.model.CarrierClass;
 import com.katalyst.model.CreateNewPO;
 import com.katalyst.model.CreateNewPO1;
+import com.katalyst.model.InVendor;
+import com.katalyst.model.OutSupplier1;
+import com.katalyst.model.OutSupplier2;
+
 import com.katalyst.model.ShipVia;
 import com.katalyst.model.SkuJson;
 import com.katalyst.model.SkuLineItemsJson;
@@ -33,14 +37,11 @@ import net.sf.json.JSONObject;
 public class ApparelMagicWSService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApparelMagicWSService.class);
-	//public StringBuilder loggerContent = new StringBuilder("");
-	//Date date = new Date();
-    //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
 
-	
-	 @Autowired public PoDao padao;
-	 
+	@Autowired
+	public PoDao padao;
+
 	public ArrayList<JSONObject> SyncPOusingDate(String _date) {
 
 		JSONObject response = null;
@@ -55,16 +56,18 @@ public class ApparelMagicWSService {
 			response = HttpClient.sendto(null, "GET",
 					"purchase_orders?time=171114279788&token=64ebd05e550b23a15be09ccef57b27c6");
 			logger.debug("The data we get from apparel Magic:" + response.toString());
-			//loggerContent.append("\n The data we get from apparel Magic:" + response.toString());
-
+			// loggerContent.append("\n The data we get from apparel Magic:" +
+			// response.toString());
+			 syncSuppliers();		
 			responsearray = (JSONArray) response.get("response");
 			int j = responsearray.size();
 			padao.createConnection();
 			for (int i = 0; i < j; i++) {
 				PO = (JSONObject) responsearray.get(i);
+
 				SkuJson post1 = mapPost1(PO);
 				CarrierClass post3 = getCarrierClass(PO.getString("ship_via"));
-				CreateNewPO newpo = mapPO(PO);
+
 				purchase_order_items = (JSONArray) PO.get("purchase_order_items");
 				int k = purchase_order_items.size();
 				// String id=
@@ -79,6 +82,7 @@ public class ApparelMagicWSService {
 				if (result == 0) {
 					int v = 0;
 					for (int m = 0; m < k; m++) {
+
 						poi = purchase_order_items.getJSONObject(m);
 						sku = mapPost2(poi);
 						post2.add(sku);
@@ -86,10 +90,12 @@ public class ApparelMagicWSService {
 						CreateNewPO1 poiobj = mapPO1(poi, PO);
 						// padao.doInsertPurchase_order_item(poiobj);
 					}
+
 					JSONObject postdataJson = postJson(post1, post2, post3);
 					logger.debug("The Json to be posted:" + postdataJson.toString());
-					//loggerContent.append("/n The Json to be posted:" + postdataJson.toString());
+					// loggerContent.append("/n The Json to be posted:" + postdataJson.toString());
 					if (!(postdataJson == null)) {
+					  			
 						Date date = new Date();
 						JSONObject addingOutput = SkuHttpClient.sendto(postdataJson, "POST", "purchaseorders/createPO");
 						addingOutput.accumulate("Integration_Type", "Purchase Orders");
@@ -107,27 +113,88 @@ public class ApparelMagicWSService {
 										: getNameForVendorId(PO.getString("vendor_id"))));
 						addingOutput.accumulate("Corresponding_Carrier_details", post3.toString());
 						addingOutput.accumulate("Corresponding_SKU", sku.getSKU());
-						
+
 						responsefromskuvault.add(addingOutput);
 						Thread.sleep(10000);
 						padao.doSkuLog(addingOutput);
 					}
 					logger.debug("Response from Sku Vault:" + responsefromskuvault);
-					//loggerContent.append("\n Response from Sku Vault:" + responsefromskuvault);
+					// loggerContent.append("\n Response from Sku Vault:" + responsefromskuvault);
 
 					// padao.doInsertPO(newpo);
 				}
 			}
 			padao.closeConnection();
-			//writeTofile(loggerContent);
+			// writeTofile(loggerContent);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			
+
 			e.printStackTrace();
 		}
 
 		return responsefromskuvault;
 
+	}
+	private JSONObject syncSuppliers() {
+
+		JSONObject response = null;
+		JSONObject PO = null;
+		JSONArray responsearray = null;		
+		JSONObject addingOutput = null;
+		try {
+			response = HttpClient.sendto(null, "GET",
+					"vendors?time=171114279788&token=64ebd05e550b23a15be09ccef57b27c6");
+			responsearray = (JSONArray) response.get("response");
+			int j = responsearray.size();
+			for (int i = 0; i < j; i++) {
+				PO = (JSONObject) responsearray.get(i);
+				OutSupplier1 postone = mapPost4(PO);
+				OutSupplier2 posttwo = mapPost3();			
+				
+				JSONObject postdataJson =  postSupplier(postone,posttwo);
+					//logger.debug("The Json to be posted:" + postdataJson.toString());
+					addingOutput = SkuHttpClient.sendto(postdataJson, "POST", "products/createSuppliers");
+					//logger.debug("Posting done" + addingOutput.toString());
+					Thread.sleep(1000);
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return addingOutput;
+	}
+	
+
+	
+	private InVendor getVendor(JSONObject PO) {
+		InVendor newpo = new InVendor();
+		newpo.setVendor_name(PO.getString("vendor_name"));
+		return newpo;
+	}
+	private JSONObject postSupplier(OutSupplier1 post2,OutSupplier2 post1) {
+		JSONArray suppliers = new JSONArray();
+		JSONObject postJson = new JSONObject();
+		for (int i = 0; i < 1; i++) {
+			suppliers.add(i, post2.toJson());
+		}
+		postJson = post1.toJson();
+		postJson.accumulate("Suppliers", suppliers);
+		return postJson;
+	}
+	private OutSupplier2 mapPost3() {
+		OutSupplier2 post1 = new OutSupplier2();		
+		post1.setTenantToken("Kels6k5wARKewRWwCs4aNtXqWNUKO+pDtuQH0/pGN1Q=");
+		post1.setUserToken("HU516hJO+DBzcpmwNu/O/RM5FFvwY2qcKK4MuXBYdRo=");
+		return post1;
+	}
+
+	private OutSupplier1 mapPost4(JSONObject PO) {
+		OutSupplier1 post = new OutSupplier1();
+		post.setName(getNameForVendorId(PO.getString("vendor_id")));
+
+		return post;
 	}
 
 	private JSONObject postJson(SkuJson post1, ArrayList<SkuLineItemsJson> post2, CarrierClass post3) {
@@ -150,7 +217,6 @@ public class ApparelMagicWSService {
 		post1.setOrderCancelDate(PO.getString("date_due"));
 		post1.setRequestedShipDate(PO.getString("date_due"));
 		post1.setPoNumber(PO.getString("purchase_order_id"));
-		// logger.info("warehouse id from ");
 		post1.setShipToWarehouse(getNameForWarehouseId(PO.getString("warehouse_id")));
 		post1.setTermsName(getNameForTermsId(PO.getString("terms_id")));
 		post1.setSupplierName(getNameForVendorId(PO.getString("vendor_id")));
@@ -165,8 +231,7 @@ public class ApparelMagicWSService {
 		post.setCost(poi.getString("amount"));
 		post.setQuantity(getQty(poi.getString("qty")));
 		post.setQuantityTo3PL(getQty(poi.getString("qty")));
-		post.setSKU(
-				poi.getString("style_number") + "-" + poi.getString("attr_2") + "-" + getSize(poi.getString("size")));
+		post.setSKU(poi.getString("style_number") + "-" + poi.getString("attr_2") + "-" + getSize(poi.getString("size")));
 		post.setIdentifier("Shipping");
 		post.setPrivateNotes("String");
 		post.setPublicNotes("String");
@@ -208,7 +273,7 @@ public class ApparelMagicWSService {
 				JSONArray responsearray = (JSONArray) response.get("response");
 				int i = responsearray.size();
 				logger.info("Response of warehouseid:" + response.toString());
-				//loggerContent.append("\n Response of warehouseid:" + response.toString());
+				// loggerContent.append("\n Response of warehouseid:" + response.toString());
 				if (i == 0) {
 					name = "BULK";
 				} else {
@@ -235,7 +300,7 @@ public class ApparelMagicWSService {
 				JSONArray responsearray = (JSONArray) response.get("response");
 				int i = responsearray.size();
 				logger.info("Response of vendorid:" + response.toString());
-				//loggerContent.append("\n Response of vendorid:" + response.toString());
+				// loggerContent.append("\n Response of vendorid:" + response.toString());
 				if (i == 0) {
 					vendor_name = "Gerald Ford";
 				} else {
@@ -262,7 +327,7 @@ public class ApparelMagicWSService {
 				JSONArray responsearray = (JSONArray) response.get("response");
 				int i = responsearray.size();
 				logger.info("Response of termsid:" + response.toString());
-				//loggerContent.append("\n Response of termsid:" + response.toString());
+				// loggerContent.append("\n Response of termsid:" + response.toString());
 				if (i == 0) {
 					name = "String";
 				} else {
@@ -281,7 +346,7 @@ public class ApparelMagicWSService {
 		CarrierClass via = new CarrierClass();
 		try {
 			if (id.equals(null)) {
-				
+
 			} else {
 				JSONObject response = HttpClient.sendto(null, "GET",
 						"ship_methods/" + id + "?time=171114279788&token=64ebd05e550b23a15be09ccef57b27c6");
@@ -326,7 +391,7 @@ public class ApparelMagicWSService {
 		poiobj.setSize(poi.getString("size"));
 		poiobj.setStyle_number(poi.getString("style_number"));
 		logger.debug("The Data of purchase orders :" + poiobj.toString());
-		//loggerContent.append("\n The Data of purchase orders :" + poiobj.toString());
+		// loggerContent.append("\n The Data of purchase orders :" + poiobj.toString());
 		return poiobj;
 	}
 
