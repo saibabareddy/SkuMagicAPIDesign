@@ -58,7 +58,8 @@ public class ApparelMagicWSService {
 			logger.debug("The data we get from apparel Magic:" + response.toString());
 			// loggerContent.append("\n The data we get from apparel Magic:" +
 			// response.toString());
-			 syncSuppliers();		
+			JSONObject sync = syncSuppliers();		
+			logger.debug("The sync done" + sync.toString());
 			responsearray = (JSONArray) response.get("response");
 			int j = responsearray.size();
 			padao.createConnection();
@@ -152,10 +153,10 @@ public class ApparelMagicWSService {
 				OutSupplier2 posttwo = mapPost3();			
 				
 				JSONObject postdataJson =  postSupplier(postone,posttwo);
-					//logger.debug("The Json to be posted:" + postdataJson.toString());
+					logger.debug("The Json to be posted:" + postdataJson.toString());
 					addingOutput = SkuHttpClient.sendto(postdataJson, "POST", "products/createSuppliers");
-					//logger.debug("Posting done" + addingOutput.toString());
-					Thread.sleep(1000);
+					logger.debug("Posting done" + addingOutput.toString());
+					Thread.sleep(5000);
 			}
 
 		} catch (Exception e) {
@@ -167,12 +168,12 @@ public class ApparelMagicWSService {
 	}
 	
 
-	
+/*	
 	private InVendor getVendor(JSONObject PO) {
 		InVendor newpo = new InVendor();
 		newpo.setVendor_name(PO.getString("vendor_name"));
 		return newpo;
-	}
+	}*/
 	private JSONObject postSupplier(OutSupplier1 post2,OutSupplier2 post1) {
 		JSONArray suppliers = new JSONArray();
 		JSONObject postJson = new JSONObject();
